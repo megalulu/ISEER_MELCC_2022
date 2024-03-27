@@ -13,14 +13,12 @@ UREC_merge = st_read(path_UREC_merge)
 path_UREC_sampling = 'C:/Meghana/TUTO/Donnees/UREC_sampling/'
 
 path_axe = 'C:/Meghana/TUTO/Traitements/axes.shp'
-axe = st_read(path_axe)
 
 path_axe_folder = 'C:/Meghana/TUTO/Traitements/axes/'
 
-
-i =1
 #Create empty list in case some UREC cannot be subdivided
 missing_sampling <- list()
+i=4
 
 #Create sampling units for UREC 
 for (i in 1:nrow(UREC_merge)){
@@ -29,6 +27,7 @@ for (i in 1:nrow(UREC_merge)){
   name = paste0(path_axe_folder, rive$id, '.shp')
   axe_intersection = st_intersection(axe, rive)
   axe_intersection = st_as_sfc(axe_intersection)
+  axe_intersection = st_line_merge(axe_intersection)#Faire une merge des features en une seule lignes pour faire st_line_sampling a 50m de distance (sinon parfois l'echantiollonage revient avec une geometry vide)
   axe_intersection = st_cast(axe_intersection, to = 'LINESTRING')
   semis = st_line_sample(axe_intersection, density = 0.02, type = 'regular')
   rive_sfc = st_as_sfc(rive)
@@ -37,7 +36,6 @@ for (i in 1:nrow(UREC_merge)){
   voronoi = st_collection_extract(st_voronoi(do.call("c", st_geometry(semis)))) #this is some weird thing off the internet. Only works if c is in quotation marks. 
   x = class(voronoi)
   if (x[1] == "sfc_POLYGON"){
-    #voronoi = st_as_sfc(voronoi)
     voronoi_crs = st_set_crs(voronoi,crs(rive))
     voronoi_crs = st_as_sf(voronoi_crs)
     rive_sampling = st_intersection(rive,voronoi_crs)

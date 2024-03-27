@@ -175,11 +175,7 @@ Indice_Naturalite_functions <-function(UREC_merge, raster_file, csv_class_corres
 }
 
 
-# UREC_water = UREC_water_merge_proj
-# raster_file = mhc_vrt
-# EPSG = 'EPSG:2949'
-# urban_vector_mask = mask_urbain_vectoriel
-# i = 1
+
 OverhangingCanopy <- function(UREC_water, raster_file, EPSG,  urban_vector_mask){
   #UREC_water : spatVector file of water surface per UREC that has been reprojected to match raster file projetion and clipped to extent of raster_file (see main)
   #raster_file : raster file (or vrt) of MHC mosaic split based on projection (either MTM7 or MTM8)

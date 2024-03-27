@@ -106,7 +106,7 @@ Correlation_matrix <- function(df, var2) {
               #cos2 : cos2 for the individuals/variables
               #contrib :  # contributions of the individuals/variables 
              # cor : matrix of covariance between variables
-df = UREC_ISEER
+
 PCA_graph_function <- function(df, df_name, axe ){
   library(factoextra)
   
