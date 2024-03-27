@@ -12,13 +12,15 @@ UREC_merge = st_read(path_UREC_merge)
 
 path_UREC_sampling = 'C:/Meghana/TUTO/Donnees/UREC_sampling/'
 
-path_axe = 'C:/Meghana/TUTO/Traitements/axes.shp'
+path_axe = 'C:/Meghana/TUTO/Traitements/axe_v3.sqlite' #nouveau axe (fait avec les memes etapes que precedment)
+axe=st_read(path_axe)#Lire le shapefile axe. Attention doit etre dans la meme projection que UREC_merge. (C'est le cas pour les donnees du tuto)
+axe <- st_set_crs(axe, 32198) #Epsg NAD83 QC lamber (il faut que la projection soit la meme que UREC_merge)
+axe = st_combine(axe)#Le shapefile axe a besoin d'etre un seul feature. Ce qui n'est pas toujours le cas. Forcer les features a se combiner en un seul feature d'axe. 
 
 path_axe_folder = 'C:/Meghana/TUTO/Traitements/axes/'
 
 #Create empty list in case some UREC cannot be subdivided
 missing_sampling <- list()
-i=4
 
 #Create sampling units for UREC 
 for (i in 1:nrow(UREC_merge)){
@@ -26,7 +28,7 @@ for (i in 1:nrow(UREC_merge)){
   print(i)
   name = paste0(path_axe_folder, rive$id, '.shp')
   axe_intersection = st_intersection(axe, rive)
-  axe_intersection = st_as_sfc(axe_intersection)
+  #axe_intersection = st_as_sfc(axe_intersection) #Enlever cette ligne parce que c'est deja un objet sf
   axe_intersection = st_line_merge(axe_intersection)#Faire une merge des features en une seule lignes pour faire st_line_sampling a 50m de distance (sinon parfois l'echantiollonage revient avec une geometry vide)
   axe_intersection = st_cast(axe_intersection, to = 'LINESTRING')
   semis = st_line_sample(axe_intersection, density = 0.02, type = 'regular')
@@ -39,6 +41,7 @@ for (i in 1:nrow(UREC_merge)){
     voronoi_crs = st_set_crs(voronoi,crs(rive))
     voronoi_crs = st_as_sf(voronoi_crs)
     rive_sampling = st_intersection(rive,voronoi_crs)
+    plot(rive_sampling$geometry)#J'ai ajouter le print ici, mais pour beaucoup d'UREC, il faut mieux l'enlever.
     print(paste0('writing rive sampling at poistion ', i, ' with Id : ', rive_sampling[1,]$id))
     st_write(rive_sampling,paste0(path_UREC_sampling, rive$id, '.shp'), delete_layer = T)
   }else {
